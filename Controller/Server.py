@@ -1,4 +1,4 @@
-import Database, CommandHandler, main
+from Controller import Database, CommandHandler
 
 
 class server:

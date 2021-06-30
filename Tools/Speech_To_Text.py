@@ -25,5 +25,7 @@ def speech_to_text():
             return text.lower()
     except sr.RequestError as e:
         print("Could not request results; {0}".format(e))
+        return ''
     except sr.UnknownValueError:
         print("unknown error occured")
+        return ''

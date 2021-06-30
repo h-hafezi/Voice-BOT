@@ -1,9 +1,12 @@
-import json, requests, os
+import json, requests
 from urllib.request import urlopen
 from urllib.parse import quote
 
-import Speech_To_Text, Text_To_Speech, Convert, main
-from Chat import Chat as chat
+import main
+from Model import Chat
+from Tools import Text_To_Speech, Speech_To_Text
+import Convert
+from Model.Chat import Chat as chat
 
 URL = main.URL
 
@@ -15,8 +18,6 @@ def speech_to_text_from_file_id(message, server):
     url = 'https://api.telegram.org/file/bot{}/{}'.format(server.token, file_path)
     r = requests.get(url, allow_redirects=True)
     open('voice.ogg', 'wb').write(r.content)
-    while not os.path.isfile('voice.ogg'):
-        pass
     Convert.convert('voice.ogg', 'voice.wav')
     answer = Speech_To_Text.speech_to_text()
     print(answer)
@@ -60,7 +61,9 @@ def reduce_updates(updates):
 
 
 def send_voice(chat_id, text):
-    Text_To_Speech.text_to_speech(text)
+    status = chat.get_chat_with_id(chat_id).status
+    pitch = 0 if status.voice_age == 'old' else 9
+    Text_To_Speech.text_to_speech(text, status.voice_gender, pitch)
     files = {'voice': open('persian.ogg', 'rb')}
     status = requests.post(URL + 'sendVoice?chat_id={}'.format(chat_id), files=files)
     print(status)
